@@ -18,7 +18,20 @@
             <strong>Symbol:</strong> <%= @stock.ticker %>
             <strong>Name:</strong> <%= @stock.name %>
             <strong>Price:</strong> <%= @stock.price %>
-            <%= link_to "Add to Stocks", user_stocks_path(user:current_user, stock_ticker:@stock.ticker, stock_id:@stock.id ? @stock.id: " "), class: "btn btn-xs btn-success", method: :post %>
+            <% if current_user.can_add_stock? %>
+                <% if @stock.id.present? %>
+                    <%  stock_already_exist = UserStock.all.where(user_id:current_user.id, stock_id: @stock.id) %>
+                    <% if stock_already_exist %>
+                        <%= "You are already following this stock"  %>
+                    <% else %>
+                        <%= link_to "Add/Find Stocks", user_stocks_path(user:current_user, stock_ticker:@stock.ticker, stock_id:@stock.id ? @stock.id: " "), class: "btn btn-xs btn-success", method: :post %>
+                    <% end %>
+                <% else %>
+                        <%= link_to "Add/Find Stocks", user_stocks_path(user:current_user, stock_ticker:@stock.ticker, stock_id:@stock.id ? @stock.id: " "), class: "btn btn-xs btn-success", method: :post %>
+                <% end %>
+            <% else %>
+                <h4 style="color:red; font-weight:bold"> You have already reached your 10 stocks limit </h4>
+            <% end %>
         </div>
     <% end %>
     <div id="stock-lookup-errors">
